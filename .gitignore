@@ -1,0 +1,5 @@
+spec
+.git
+test.js
+.DS_Store
+node_modules
