@@ -1,3 +1,14 @@
 {
-  extends: "@tuomashatakka"
+  extends: "@tuomashatakka",
+  plugins: [
+    "block-padding"
+  ],
+  rules: {
+    'block-padding/classes':          [ 1 ],
+    'block-padding/methods':          [ 1 ],
+    'block-padding/functions':        [ 1 ],
+    'block-padding/variables':        [ 0 ],
+    'block-padding/default-exports':  [ 0 ],
+    'block-padding/exports':          [ 0 ],
+  }
 }
