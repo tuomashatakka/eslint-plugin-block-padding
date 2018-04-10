@@ -32,7 +32,6 @@ const selector = (...sel) =>
 
 module.exports = {
   rules: {
-    'class-definitions':  createRule(':not(*)', meta),
     'classes':            createRule('ClassDeclaration', meta),
     'methods':            createRule('MethodDefinition', meta),
     'functions':          createRule(
@@ -49,12 +48,33 @@ module.exports = {
   }
 }
 
-const getPadding = (first, second) => [ first, second ].indexOf(null) === -1
-  ? Math.max(0, Math.abs(second.loc.start.line - first.loc.end.line) - 1)
-  : null
+function getPadding (first, second) {  // eslint-disable-line max-statements
+  if ([ first, second ].includes(null))
+    return null
+
+  const diff = Math.abs(first.loc.start.line - second.loc.end.line) - 1
+
+  return Math.max(0, diff)
+}
 
 
-function resolveMainNode (node) {
+function findFirst (candidate, current) {
+  if (!candidate || current.start < candidate.start)
+    return current
+  return candidate
+}
+
+
+const getFirstDecorator = (node) =>
+  node.decorators.reduce(findFirst, null)
+
+
+function resolveMainNode (original) {
+  let node = Object.assign({}, original)
+
+  if (node.decorators)
+    return getFirstDecorator(node)
+
   if (node.parent.type.startsWith('Export'))
     node = node.parent
   if (node.parent.type === 'VariableDeclarator')
@@ -80,52 +100,16 @@ function resolveData (lines, requiredLines) {
 function createFor (selector, definition) {
 
   return function (context) {
-    const requiredLines = extract.call(definition, context.options)
-    const strategy      = extract.call(definition, context.options, 'strategy')
 
-    let compare
-
-    let fix = () => () => {
-
-      // TODO
-
+    const options = {
+      requiredLines: extract.call(definition, context.options),
+      strategy:      extract.call(definition, context.options, 'strategy'),
     }
 
-    switch (strategy) {
-
-        case 'at-most':
-          compare = (n) => n <= requiredLines
-
-          // fix = (before, start) => fixer => {
-          //
-          //   // TODO
-          //   // while (getPadding(before, start) > requiredLines)
-          //   //   Remove a line
-          //   fixer.remove(before)
-          // }
-          break
-
-        case 'at-least':
-          compare = (n) => n >= requiredLines
-
-          // fix = (before, start) => fixer => {
-          //   while (getPadding(before, start) < requiredLines)
-          //     fixer.insertTextBefore(start, "\n")
-          // }
-          break
-
-        default:
-          compare = (n) => n === requiredLines
-
-          // fix = (before, start) => fixer => {
-          //   while (getPadding(before, start) < requiredLines)
-          //     fixer.insertTextBefore(start, "\n")
-          //   // TODO:
-          //   // while (getPadding(before, start) > requiredLines)
-          //   //   Remove a line
-          // }
-
-    }
+    // TODO
+    // getFixFunction(options)
+    const fix = () => () => null
+    const compare = getComparatorFunction(options)
 
     function check (node) {
 
@@ -135,7 +119,7 @@ function createFor (selector, definition) {
       const opts     = { includeComments: true }
       const previous = src.getTokenBefore(node, opts)
       const start    = src.getFirstToken(node, opts)
-      const lines    = getPadding(previous, start)
+      const lines    = getPadding.call(src, previous, start)
 
       // Is the node is first or last, lines gets null
       // as its value. We should ignore those cases.
@@ -143,12 +127,59 @@ function createFor (selector, definition) {
         context.report({
           message,
           node: start,
-          data: resolveData(lines, requiredLines),
+          data: resolveData(lines, options.requiredLines),
           fix:  fix(previous, start),
         })
     }
 
     return { [selector]: check }
+  }
+}
+
+
+function getComparatorFunction (options) {
+  switch (options.strategy) {
+
+      case 'at-most':
+        return (n) => n <= options.requiredLines
+      case 'at-least':
+        return (n) => n >= options.requiredLines
+      default:
+        return (n) => n === options.requiredLines
+
+  }
+}
+
+
+function getFixFunction (options) {
+  switch (options.strategy) {
+
+      case 'at-most':
+        return (before, start) => fixer => {
+
+          // TODO
+          // while (getPadding(before, start) > options.requiredLines)
+          //   Remove a line
+          fixer.remove(before)
+        }
+
+      case 'at-least':
+
+        return  (before, start) => fixer => {
+          while (getPadding(before, start) < options.requiredLines)
+            fixer.insertTextBefore(start, "\n")
+        }
+
+      default:
+        return (before, start) => fixer => {
+          while (getPadding(before, start) < options.requiredLines)
+            fixer.insertTextBefore(start, "\n")
+
+          // TODO:
+          // while (getPadding(before, start) > requiredLines)
+          //   Remove a line
+        }
+
   }
 }
 
