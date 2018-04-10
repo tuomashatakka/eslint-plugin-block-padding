@@ -1,34 +1,14 @@
 /* eslint block-padding/functions: [ 1, 2 ] */
 const resolvers = require('./resolvers')
-// const extract   = require('./options')
+const meta      = require('./options')
 
 const message = `Too {{ term }} blank lines {{ direction }} the block. Expected {{ expected }}, got {{ actual }}.`
 
-const options = [
-  {
-    type: "number",
-    title: "Blank lines",
-    default: 1,
-  },
-  {
-    type: "object",
-    title: "Options",
-    properties: {
-      strategy: {
-        enum:  [ "exact", "at-most", "at-least" ],
-        default: "exact",
-      }
-    }
-  },
-]
-
-const meta = {
-  schema: options,
-  fixable: true }
-
 
 const createRule = (selector, meta) => ({
-  meta, create: createFor(selector, { meta }) })
+  meta,
+  create: createFor(selector, { meta })
+})
 
 
 const selector = (...sel) =>
@@ -50,39 +30,6 @@ module.exports = {
     'blocks':             createRule('BlockStatement', meta),
     'default-exports':    createRule('ExportDefaultDeclaration', meta),
     'exports':            createRule('ExportNamedDeclaration', meta),
-  }
-}
-
-
-function getPadding (first, second) {  // eslint-disable-line max-statements
-  if ([ first, second ].includes(null))
-    return null
-  const diff = Math.abs(first.loc.start.line - second.loc.end.line) - 1
-  return Math.max(0, diff)
-}
-
-
-function resolveMainNode (original) {  // eslint-disable-line complexity
-  let node = Object.assign({}, original)
-
-  let resolver = null
-  const localResolvers = [ ...resolvers ]
-  while (resolver = localResolvers.shift())
-    if (resolver.test(node)) {
-      node = resolver.assign(node)
-      if (resolver.terminal)
-        return node
-    }
-  return node
-}
-
-
-function resolveData (lines, requiredLines) {
-  return {
-    direction: 'before',
-    expected:  requiredLines,
-    actual:    lines,
-    term:      lines > requiredLines ? 'many' : 'few'
   }
 }
 
@@ -124,6 +71,39 @@ function createFor (selector, definition) {
     }
 
     return { [selector]: check }
+  }
+}
+
+
+function getPadding (first, second) {  // eslint-disable-line max-statements
+  if ([ first, second ].includes(null))
+    return null
+  const diff = Math.abs(first.loc.start.line - second.loc.end.line) - 1
+  return Math.max(0, diff)
+}
+
+
+function resolveMainNode (original) {  // eslint-disable-line complexity
+  let node = Object.assign({}, original)
+
+  let resolver = null
+  const localResolvers = [ ...resolvers ]
+  while (resolver = localResolvers.shift())
+    if (resolver.test(node)) {
+      node = resolver.assign(node)
+      if (resolver.terminal)
+        return node
+    }
+  return node
+}
+
+
+function resolveData (lines, requiredLines) {
+  return {
+    direction: 'before',
+    expected:  requiredLines,
+    actual:    lines,
+    term:      lines > requiredLines ? 'many' : 'few'
   }
 }
 

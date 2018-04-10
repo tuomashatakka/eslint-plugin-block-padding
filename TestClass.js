@@ -26,21 +26,20 @@ class TestClassThree {
 
 export function asd () {}
 
-const xd = function basd () {}
+export const xd = function basd () {}
 
 const arr = []
 
 arr.map(() => {})
 
-
 const xds = () => {
   let asd = 2
+  return asd
 }
 
 
 if (1 === 2) {
-  console.warn("KSD")
+  xds("KSD")
 }
-
 
 module.exports.asde = function () {}
