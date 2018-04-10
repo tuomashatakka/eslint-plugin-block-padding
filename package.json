@@ -4,7 +4,7 @@
   "description": "Consistent empty line count between code blocks",
   "main": "index.js",
   "scripts": {
-    "test": "$(npm bin)/eslint TestClass.js"
+    "test": "$(npm bin)/eslint spec/object-property-function.js"
   },
   "author": "tuomashatakka <tuomas.hatakka@gmail.com>",
   "license": "ISC",

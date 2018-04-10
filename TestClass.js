@@ -1,34 +1,36 @@
 
+import asd from './spec/inline-functions'
 
-class TestClasscx { }
+function decor (a) {
+  return a
+}
 
-
-class TestClass {
-
-
+@decor @decor export class TestClass {
 
   constructor () {
 
   }
-
 }
 
+class TestClasscx { }
 
 export default class TestClassTwo {
 
 }
-// lol
 
+// lol
 
 class TestClassThree {
 
 }
 
-
 export function asd () {}
 
-
 const xd = function basd () {}
+
+const arr = []
+
+arr.map(() => {})
 
 
 const xds = () => {

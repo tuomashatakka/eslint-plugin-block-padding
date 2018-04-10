@@ -1,3 +1,6 @@
+/* eslint block-padding/functions: [ 1, 2 ] */
+const resolvers = require('./resolvers')
+// const extract   = require('./options')
 
 const message = `Too {{ term }} blank lines {{ direction }} the block. Expected {{ expected }}, got {{ actual }}.`
 
@@ -23,8 +26,10 @@ const meta = {
   schema: options,
   fixable: true }
 
+
 const createRule = (selector, meta) => ({
   meta, create: createFor(selector, { meta }) })
+
 
 const selector = (...sel) =>
   sel.join(', ')
@@ -48,12 +53,11 @@ module.exports = {
   }
 }
 
+
 function getPadding (first, second) {  // eslint-disable-line max-statements
   if ([ first, second ].includes(null))
     return null
-
   const diff = Math.abs(first.loc.start.line - second.loc.end.line) - 1
-
   return Math.max(0, diff)
 }
 
@@ -64,25 +68,21 @@ function findFirst (candidate, current) {
   return candidate
 }
 
-
 const getFirstDecorator = (node) =>
   node.decorators.reduce(findFirst, null)
 
 
-function resolveMainNode (original) {
+function resolveMainNode (original) {  // eslint-disable-line complexity
   let node = Object.assign({}, original)
 
-  if (node.decorators)
-    return getFirstDecorator(node)
-
-  if (node.parent.type.startsWith('Export'))
-    node = node.parent
-  if (node.parent.type === 'VariableDeclarator')
-    node = node.parent
-  if (node.parent.type === 'VariableDeclaration')
-    node = node.parent
-  if (node.parent.type === 'AssignmentExpression')
-    node = node.parent.left
+  let resolver = null
+  const localResolvers = [ ...resolvers ]
+  while (resolver = localResolvers.shift())
+    if (resolver.test(node)) {
+      node = resolver.assign(node)
+      if (resolver.terminal)
+        return node
+    }
   return node
 }
 
@@ -99,6 +99,7 @@ function resolveData (lines, requiredLines) {
 
 function createFor (selector, definition) {
 
+
   return function (context) {
 
     const options = {
@@ -106,10 +107,10 @@ function createFor (selector, definition) {
       strategy:      extract.call(definition, context.options, 'strategy'),
     }
 
-    // TODO
-    // getFixFunction(options)
-    const fix = () => () => null
+
+    const fix = () => getFixFunction(options)
     const compare = getComparatorFunction(options)
+
 
     function check (node) {
 
@@ -139,50 +140,50 @@ function createFor (selector, definition) {
 
 function getComparatorFunction (options) {
   switch (options.strategy) {
-
-      case 'at-most':
-        return (n) => n <= options.requiredLines
-      case 'at-least':
-        return (n) => n >= options.requiredLines
-      default:
-        return (n) => n === options.requiredLines
-
+    case 'at-most':
+      return (n) => n <= options.requiredLines
+    case 'at-least':
+      return (n) => n >= options.requiredLines
+    default:
+      return (n) => n === options.requiredLines
   }
 }
 
 
 function getFixFunction (options) {
+
+  return () => null
+
   switch (options.strategy) {
 
-      case 'at-most':
-        return (before, start) => fixer => {
+    case 'at-most':
+      return (before, start) => fixer => {
 
-          // TODO
-          // while (getPadding(before, start) > options.requiredLines)
-          //   Remove a line
-          fixer.remove(before)
-        }
+        // TODO
+        // while (getPadding(before, start) > options.requiredLines)
+        //   Remove a line
+        fixer.remove(before)
+      }
 
-      case 'at-least':
+    case 'at-least':
 
-        return  (before, start) => fixer => {
-          while (getPadding(before, start) < options.requiredLines)
-            fixer.insertTextBefore(start, "\n")
-        }
+      return  (before, start) => fixer => {
+        while (getPadding(before, start) < options.requiredLines)
+          fixer.insertTextBefore(start, "\n")
+      }
 
-      default:
-        return (before, start) => fixer => {
-          while (getPadding(before, start) < options.requiredLines)
-            fixer.insertTextBefore(start, "\n")
+    default:
+      return (before, start) => fixer => {
+        while (getPadding(before, start) < options.requiredLines)
+          fixer.insertTextBefore(start, "\n")
 
-          // TODO:
-          // while (getPadding(before, start) > requiredLines)
-          //   Remove a line
-        }
+        // TODO:
+        // while (getPadding(before, start) > requiredLines)
+        //   Remove a line
+      }
 
   }
 }
-
 
 function extract (options, key = null) {
   if (key === null)
@@ -196,13 +197,11 @@ function extract (options, key = null) {
   return val || opts[key].default
 }
 
-
 function getPositionalArgument (options, n) {
   return options instanceof Array && options.length > n
     ? options[n]
     : this.meta.schema[n].default
 }
-
 
 function normalize (options) {
   if (options instanceof Array)
