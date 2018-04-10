@@ -26,7 +26,12 @@ const parentTypeResolver = (type) => ({
 const returnResolver = parentTypeResolver('ReturnStatement')
 
 const variableResolver = {
-  test:   testParentTypeBegins('VariableDeclarat'),
+  test:   testParentType('VariableDeclaration'),
+  assign: assignParent,
+}
+
+const variableDeclaratorResolver = {
+  test:   testParentType('VariableDeclarator'),
   assign: assignParent,
 }
 
@@ -47,23 +52,39 @@ const callExpressionResolver = {
   test:   testParentType('CallExpression'),
 }
 
+const arrowFunctionExpressionResolver = {
+  test:   testParentType('ArrowFunctionExpression'),
+  assign: assignParent,
+}
+
 const objectPropertyResolver = {
   test:   testParentType('Property'),
   assign: assignParent,
 }
 
+const switchCaseResolver = {
+  test:   testParentType('SwitchCase'),
+  assign: assignParent,
+}
+
 const decoratorResolver = {
+
   assign:   node => getFirstDecorator(node),
+
   test:     node => node.decorators && node.decorators.length,
+
   terminal: true,
 }
 
 module.exports = [
   decoratorResolver,
+  variableDeclaratorResolver,
   variableResolver,
   exportResolver,
   assignmentResolver,
   callExpressionResolver,
+  arrowFunctionExpressionResolver,
   objectPropertyResolver,
   returnResolver,
+  switchCaseResolver,
 ]

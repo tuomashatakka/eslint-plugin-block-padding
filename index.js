@@ -62,16 +62,6 @@ function getPadding (first, second) {  // eslint-disable-line max-statements
 }
 
 
-function findFirst (candidate, current) {
-  if (!candidate || current.start < candidate.start)
-    return current
-  return candidate
-}
-
-const getFirstDecorator = (node) =>
-  node.decorators.reduce(findFirst, null)
-
-
 function resolveMainNode (original) {  // eslint-disable-line complexity
   let node = Object.assign({}, original)
 
@@ -140,10 +130,16 @@ function createFor (selector, definition) {
 
 function getComparatorFunction (options) {
   switch (options.strategy) {
+
+
     case 'at-most':
       return (n) => n <= options.requiredLines
+
+
     case 'at-least':
       return (n) => n >= options.requiredLines
+
+
     default:
       return (n) => n === options.requiredLines
   }
@@ -152,9 +148,11 @@ function getComparatorFunction (options) {
 
 function getFixFunction (options) {
 
+
   return () => null
 
   switch (options.strategy) {
+
 
     case 'at-most':
       return (before, start) => fixer => {
@@ -165,12 +163,13 @@ function getFixFunction (options) {
         fixer.remove(before)
       }
 
-    case 'at-least':
 
+    case 'at-least':
       return  (before, start) => fixer => {
         while (getPadding(before, start) < options.requiredLines)
           fixer.insertTextBefore(start, "\n")
       }
+
 
     default:
       return (before, start) => fixer => {
@@ -185,6 +184,7 @@ function getFixFunction (options) {
   }
 }
 
+
 function extract (options, key = null) {
   if (key === null)
     return getPositionalArgument.call(this, options, 0)
@@ -197,11 +197,13 @@ function extract (options, key = null) {
   return val || opts[key].default
 }
 
+
 function getPositionalArgument (options, n) {
   return options instanceof Array && options.length > n
     ? options[n]
     : this.meta.schema[n].default
 }
+
 
 function normalize (options) {
   if (options instanceof Array)
