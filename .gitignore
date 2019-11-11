@@ -1,5 +1,7 @@
-spec
 .git
-test.js
+.vscode
 .DS_Store
 node_modules
+
+TestClass.js
+spec/
