@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run lint && node test",
-    "lint": "eslint ./(index|options|resolvers).js",
+    "lint": "eslint './(index|options|resolvers).js'",
     "prepublishOnly": "npm run test"
   },
   "author": "tuomashatakka <tuomas.hatakka@gmail.com>",
