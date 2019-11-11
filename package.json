@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-block-padding",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Consistent empty line count between code blocks",
   "main": "index.js",
   "scripts": {
