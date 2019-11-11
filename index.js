@@ -127,42 +127,42 @@ function getComparatorFunction (options) {
 }
 
 
-function getFixFunction (options) {
+function getFixFunction (/*options*/) {
 
 
   return () => null
 
-  switch (options.strategy) {
+  // switch (options.strategy) {
 
 
-    case 'at-most':
-      return (before, start) => fixer => {
+  //   case 'at-most':
+  //     return (before, start) => fixer => {
 
-        // TODO
-        // while (getPadding(before, start) > options.requiredLines)
-        //   Remove a line
-        fixer.remove(before)
-      }
-
-
-    case 'at-least':
-      return  (before, start) => fixer => {
-        while (getPadding(before, start) < options.requiredLines)
-          fixer.insertTextBefore(start, "\n")
-      }
+  //       // TODO
+  //       // while (getPadding(before, start) > options.requiredLines)
+  //       //   Remove a line
+  //       fixer.remove(before)
+  //     }
 
 
-    default:
-      return (before, start) => fixer => {
-        while (getPadding(before, start) < options.requiredLines)
-          fixer.insertTextBefore(start, "\n")
+  //   case 'at-least':
+  //     return  (before, start) => fixer => {
+  //       while (getPadding(before, start) < options.requiredLines)
+  //         fixer.insertTextBefore(start, "\n")
+  //     }
 
-        // TODO:
-        // while (getPadding(before, start) > requiredLines)
-        //   Remove a line
-      }
 
-  }
+  //   default:
+  //     return (before, start) => fixer => {
+  //       while (getPadding(before, start) < options.requiredLines)
+  //         fixer.insertTextBefore(start, "\n")
+
+  //       // TODO:
+  //       // while (getPadding(before, start) > requiredLines)
+  //       //   Remove a line
+  //     }
+
+  // }
 }
 
 

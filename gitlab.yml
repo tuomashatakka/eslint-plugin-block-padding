@@ -1,0 +1,21 @@
+image: node:alpine
+
+before_script:
+  - npm install
+  - export NODE_ENV=production
+
+stages:
+  - test
+
+test:
+  stage: test
+  script: npm test
+
+lint:
+  stage: test
+  script: npm run lint
+
+cache:
+  untracked: true
+  paths:
+  - node_modules/
