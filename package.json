@@ -4,9 +4,9 @@
   "description": "Consistent empty line count between code blocks",
   "main": "index.js",
   "scripts": {
-    "test": "npm run lint && node test",
+    "test": "node test",
     "lint": "eslint './(index|options|resolvers).js'",
-    "prepublishOnly": "npm run test"
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "author": "tuomashatakka <tuomas.hatakka@gmail.com>",
   "license": "ISC",
