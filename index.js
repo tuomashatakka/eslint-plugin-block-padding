@@ -14,18 +14,19 @@ const createRule = (selector, meta) => ({
 const selector = (...sel) =>
   sel.join(', ')
 
+const FUNCTION_SELECTOR = selector(
+  'FunctionDeclaration',
+  ':not(MethodDefinition) > FunctionExpression'
+)
+
+const ARROW_FUNCTION_SELECTOR = ':not(MethodDefinition) > ArrowFunctionExpression'
 
 module.exports = {
   rules: {
     'classes':            createRule('ClassDeclaration', meta),
     'methods':            createRule('MethodDefinition', meta),
-    'functions':          createRule(
-      selector(
-        'FunctionDeclaration',
-        ':not(MethodDefinition) > FunctionExpression',
-        ':not(MethodDefinition) > ArrowFunctionExpression'),
-      meta
-    ),
+    'functions':          createRule(FUNCTION_SELECTOR, meta),
+    'arrow-functions':    createRule(ARROW_FUNCTION_SELECTOR, meta),
     'variables':          createRule('VariableDeclaration', meta),
     'blocks':             createRule('BlockStatement', meta),
     'default-exports':    createRule('ExportDefaultDeclaration', meta),
